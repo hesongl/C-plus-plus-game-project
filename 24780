@@ -1,0 +1,119 @@
+//
+//  PS4-2.cpp
+//  PS4-2
+//
+//  Created by Hesong Lyu on 9/25/17.
+//  Copyright © 2017 Hesong Lyu. All rights reserved.
+//
+
+#include "fssimplewindow.h"
+#include "time.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "math.h"
+
+void DrawTarget(int x, int y, int sizex, int sizey)
+{
+    glColor3b(1,0,0);
+    glBegin(GL_QUADS);
+    glVertex2i(x, y);
+    glVertex2i(x, y + sizey);
+    glVertex2i(x + sizex, y + sizey);
+    glVertex2i(x + sizex, y);
+    glEnd();
+}
+
+void MoveTarget(int &x, int &speed)
+{
+    x += speed;
+    if (x < 0 || x > 800)
+    {
+        speed = -speed;
+    }
+}
+
+void DrawPlayer(int x, int y)
+{
+    glColor3b(0, 1, 0);
+    glBegin(GL_QUADS);
+    glVertex2i(x-5,y-19);
+    glVertex2i(x+4,y-19);
+    glVertex2i(x+4,y   );
+    glVertex2i(x-5,y   );
+    glVertex2i(x-15,y-9);
+    glVertex2i(x+14,y-9);
+    glVertex2i(x+14,y  );
+    glVertex2i(x-15,y  );
+    glEnd();
+    
+}
+
+int main()
+{
+    FsOpenWindow(16,16,800,600,1);
+    //spaceship
+    int terminate = 0, playerX = 400, playerY = 580;
+    //missle
+    int missleFlag = 0, mX = 0, mY = 600;
+    //target
+    int targetX=0,targetY=100,targetSizeX=100,targetSizeY=20, speed=10;
+    
+    while (terminate == 0)
+    {
+        //get key
+        FsPollDevice();
+        auto key = FsInkey();
+        switch(key) {
+            case FSKEY_ESC:
+                printf("Exit game!\n");
+                terminate = 1;
+                break;
+            case FSKEY_LEFT:
+                if (playerX >=30)
+                playerX -= 10;
+                break;
+            case FSKEY_RIGHT:
+                if (playerX <= 770)
+                playerX += 10;
+                break;
+            case FSKEY_SPACE:
+                if (missleFlag == 0)
+                {
+                    mX = playerX;
+                    mY = playerY;
+                    missleFlag = 1;
+                }
+                
+        }
+        if (terminate)
+        {
+            break;
+        }
+        //draw space ship
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        DrawPlayer(playerX, playerY);
+        //draw missile
+        if (missleFlag == 1)
+        {
+            mY -= 15;
+            if (mY < 0)
+            {
+                missleFlag = 0;
+            }
+            glColor3b(0, 1, 1);
+            //difference between gl_lines and gl_line.... omg
+            glBegin(GL_LINES);
+            glVertex2i(mX, mY);
+            glVertex2i(mX, mY-14);
+            glEnd();
+        }
+        //draw target
+        MoveTarget(targetX, speed);
+        DrawTarget(targetX, targetY, targetSizeX, targetSizeY);
+        
+        FsSwapBuffers();
+        FsSleep(20);
+    }
+    return 0;
+}
+
