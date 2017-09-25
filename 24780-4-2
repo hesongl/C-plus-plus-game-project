@@ -12,9 +12,9 @@ void MoveCanon(double &x,double &y,double &vx,double &vy,double dt,int &flag)
     x+=vx*dt;
     y+=vy*dt;
     double ax=0.0;
-    double ay=0.98*1.6;
-    vx+=ax*dt;
-    vy+=ay*dt;
+    double ay = 9.8;
+    vx+=ax*dt*10;
+    vy+=ay*dt*10;
     if (y >= 600 || x < 0)
     {
         flag = 0;
@@ -94,8 +94,8 @@ int main()
                 glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
                 cx=19+32.0*cos(theta/180*PI);
                 cy=583 - 32.0*sin(theta/180*PI);
-                vx=40*cos(theta/180*PI);
-                vy=-40*sin(theta/180*PI);
+                vx=400*cos(theta/180*PI);
+                vy=-400*sin(theta/180*PI);
                 canonflag = 1;
                 //MoveCanon(cx, cy, vx, vy, dt);
                 //DrawCanon(cx, cy);
