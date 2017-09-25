@@ -1,0 +1,122 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include "fssimplewindow.h"
+
+#define SPEED 40
+#define PI 3.1415926
+
+void MoveCanon(double &x,double &y,double &vx,double &vy,double dt,int &flag)
+{
+    x+=vx*dt;
+    y+=vy*dt;
+    double ax=0.0;
+    double ay=0.98*1.6;
+    vx+=ax*dt;
+    vy+=ay*dt;
+    if (y >= 600 || x < 0)
+    {
+        flag = 0;
+    }
+}
+void DrawCanon(double x,double y)
+{
+    glBegin(GL_TRIANGLE_FAN);
+    for(int i=0; i<=64; ++i)
+    {
+        double angle=(double)i*PI/32.0;
+        double c=cos(angle);
+        double s=sin(angle);
+        glVertex2d((double)x+c*3,(double)y+s*3);
+    }
+    glEnd();
+}
+void GenerateObstacles()
+{
+    //we limit the top left corner of the obstacles as reference
+}
+    
+void DrawBase()
+{
+    glColor3d(0,0,1);
+    glBegin(GL_QUADS);
+    int x=16,y=580,step=6;
+    glVertex2i(x, y);
+    glVertex2i(x, y+step);
+    glVertex2i(x+step, y+step);
+    glVertex2i(x+step, y);
+    glEnd();
+}
+void DrawLine(double theta)
+{
+    glColor3d(1, 0, 0);
+    glBegin(GL_LINES);
+    double x=19,y=583;
+    double angle=theta;
+    glVertex2d(x, y);
+    glVertex2d(x + 32.0*cos(angle/180*PI), y - 32.0*sin(angle/180*PI));
+    glEnd();
+    
+}
+
+int main()
+{
+    double dt=0.25;
+    double x0=6,y0=6;
+    double cx,cy,vx,vy;
+    int terminate = 0;
+    double theta = 0.0;
+    int canonflag = 0;
+
+    FsOpenWindow(16, 16, 800, 600, 1);
+
+    while (!terminate)
+    {
+        FsPollDevice();
+        auto key = FsInkey();
+        switch(key)
+        {
+            case FSKEY_ESC:
+                terminate = 1;
+                break;
+            case FSKEY_UP:
+                theta+=1.0;
+                break;
+            case FSKEY_DOWN:
+                theta-=1.0;
+                break;
+            case FSKEY_SPACE:
+                if (canonflag != 0)
+                {
+                    break;
+                }
+                glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+                cx=19+32.0*cos(theta/180*PI);
+                cy=583 - 32.0*sin(theta/180*PI);
+                vx=40*cos(theta/180*PI);
+                vy=-40*sin(theta/180*PI);
+                canonflag = 1;
+                //MoveCanon(cx, cy, vx, vy, dt);
+                //DrawCanon(cx, cy);
+                break;
+        }
+        glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+        DrawBase();
+        DrawLine(theta);
+        //DrawCanon(19+32.0*cos(theta/180*PI),583 - 32.0*sin(theta/180*PI));
+        while (canonflag == 1)
+        {
+            double sx = cx;
+            double sy = cy;
+            //MoveCanon(cx, cy, vx, vy, dt,canonflag);
+            DrawCanon(sx, sy);
+            MoveCanon(cx,cy,vx,vy,dt,canonflag);
+            
+        }
+        
+        FsSwapBuffers();
+        FsSleep(40);
+    }
+
+}
