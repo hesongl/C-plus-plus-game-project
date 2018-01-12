@@ -1,7 +1,5 @@
 # 24780project
-team project for a game
+This is the C++ project for a bubble man game.
 
-# ToDo list
-- [ ] write class individually
-- [ ] merge all class
-- [ ] test
+# Additional link
+For the whole project and repository, checkout this: https://github.com/24780inoodlessquad/24780project
